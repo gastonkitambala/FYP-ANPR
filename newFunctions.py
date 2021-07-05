@@ -18,7 +18,7 @@ GPIO.setup(IR1, GPIO.IN)
 GPIO.setup(IR2, GPIO.IN)
 GPIO.setup(exitIR, GPIO.IN)
 GPIO.setup(servoPin,GPIO.OUT)
-pwm = GPIO.PWM(servoPin, 50)
+#pwm = GPIO.PWM(servoPin, 50)
 
 def servoOpenClose():
     pwm.start(2)
@@ -36,7 +36,7 @@ def slotsAvailable():
         availableSlots = 2
     if sensor1 == 0 and sensor2 == 0:
         availableSlots = 0
-               
+
 
 def checkEmptySlot():
     sensor1 = GPIO.input(IR1)
@@ -60,7 +60,7 @@ def checkEmptySlot():
         
 def sendEmail(text):
     #currentTime = time.ctime()
-    emailContent = ("Vehicle: " + text + "Has been granted access at: " )#+ currentTime)
+    emailContent = ("Vehicle: " + text + "Has been granted access at: " )
     server.sendmail("gastonkitambala@gmail.com","gastonkitambala@yahoo.com",emailContent)
 
 def allowCar() :
