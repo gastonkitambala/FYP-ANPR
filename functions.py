@@ -18,7 +18,7 @@ GPIO.setup(IR1, GPIO.IN)
 GPIO.setup(IR2, GPIO.IN)
 GPIO.setup(exitIR, GPIO.IN)
 GPIO.setup(servoPin,GPIO.OUT)
-pwm = GPIO.PWM(servoPin, 50)
+#pwm = GPIO.PWM(servoPin, 50)
 
 def servoOpenClose():
     pwm.start(2)

@@ -1,5 +1,5 @@
 import cv2
-from functions import checkEmptySlot, sendEmail #servoOpenClose, 
+from functions import checkEmptySlot, sendEmail#, servoOpenClose
 from functions import checkEmptySlot
 from sendmsdbig import sender
 import drivers
@@ -48,7 +48,7 @@ if check_if_string_in_file('./Database/Database.txt', text) and text != "":
     sendTo = 'gastonkitambala@yahoo.com'
     emailSubject = "APPROACHING VEHICLE!"
     emailContent = "The vehicle with license number: " + content +" "+"has been granted access on:\n " + time.ctime()
-    #sender.sendmail(sendTo, emailSubject, emailContent)
+    sender.sendmail(sendTo, emailSubject, emailContent)
     print("Email Sent")
     time.sleep(1)
     GPIO.cleanup()

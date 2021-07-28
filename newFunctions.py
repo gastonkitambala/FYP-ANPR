@@ -1,25 +1,33 @@
-import RPi.GPIO as GPIO
+#FUnctions Used for the Optical Opto_Gate System
+import RPi.GPIO as GPIO #Gpio Library
 import time
-#Email Server
-import smtplib
-server=smtplib.SMTP('smtp.gmail.com',587)
-server.starttls()
+#Importing Email Server
+import smtplib  #Email Library
+server = smtplib.SMTP('smtp.gmail.com',587)
+server.starttls() #Start the server for email
 server.login("gastonkitambala@gmail.com", "kitambalas1998")
-####
+####  LCD Drivers
 import drivers
 display = drivers.Lcd()
 
-servoPin =11
-IR1 = 31
+#GPIO Setup
+servoPin = 11 #Pin 11 for Servo Motor
+#Infrared sensor for partin 1,2 and exit
+IR1 = 31   
 IR2 = 33
 exitIR = 37
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BOARD) #Gpio.Board setmode used
+#IR1, IR2 And exitIR set as inputs
 GPIO.setup(IR1, GPIO.IN)
 GPIO.setup(IR2, GPIO.IN)
 GPIO.setup(exitIR, GPIO.IN)
 GPIO.setup(servoPin,GPIO.OUT)
-#pwm = GPIO.PWM(servoPin, 50)
+pwm = GPIO.PWM(servoPin, 50) #Starting Pulse width Modulation at 50Hz for Servo Motor
+#Listening to Sensor 1 and Sensor 2 for input 
+sensor1 = GPIO.input(IR1)
+sensor2 = GPIO.input(IR2)
 
+#Function for Opening and Closing the ServoMotor for after access Granting
 def servoOpenClose():
     pwm.start(2)
     time.sleep(.5)
@@ -29,9 +37,10 @@ def servoOpenClose():
     time.sleep(10)
     pwm.stop()
 
+#Function to check the available parking space
 def slotsAvailable():
     if sensor1 or sensor2 == 0:
-         availableSlots =1
+         availableSlots = 1
     if sensor1 ==1 and sensor2 ==1:
         availableSlots = 2
     if sensor1 == 0 and sensor2 == 0:
@@ -39,8 +48,6 @@ def slotsAvailable():
 
 
 def checkEmptySlot():
-    sensor1 = GPIO.input(IR1)
-    sensor2 = GPIO.input(IR2)
     exitSensor = GPIO.input(exitIR)
     
     if sensor1 == 1 and sensor2 == 1:
@@ -58,46 +65,9 @@ def checkEmptySlot():
     else:
         print("Unavailable")
         
+#Function for sending Email
 def sendEmail(text):
     #currentTime = time.ctime()
     emailContent = ("Vehicle: " + text + "Has been granted access at: " )
     server.sendmail("gastonkitambala@gmail.com","gastonkitambala@yahoo.com",emailContent)
-
-def allowCar() :
-    print('Registered')
-    display.lcd_display_string("WELCOME:", 1)
-    display.lcd_display_string(text, 2)
-    time.sleep(2)
-    #IR(Empty Slot)
-    checkEmptySlot()
-    time.sleep(1)
-    #ServoMotor
-    servoOpenClose()
-    #send email
-    sendTo = 'gastonkitambala@yahoo.com'
-    emailSubject = "APPROACHING VEHICLE!"
-    emailContent = "The vehicle with license number: " + content +" "+"has been granted access on:\n " + time.ctime()
-    #sender.sendmail(sendTo, emailSubject, emailContent)
-    print("Email Sent")
-    time.sleep(1)
-    GPIO.cleanup()
-    time.sleep(1)
-    display.lcd_clear()
-
-
-def unauthorised(text, content) :
-    print('Not Registered')
-    display.lcd_display_string(text, 1)
-    display.lcd_display_string("NOT REGISTERED", 2)
-    time.sleep(3)
-    display.lcd_display_string("ACCESS DENIED   ", 2)
-    time.sleep(4)
-    display.lcd_display_string("Call Admin      ", 2)
-    sendTo = 'gastonkitambala@yahoo.com'
-    emailSubject = "ACCESS DENIED!"
-    emailContent = "The vehicle with license number: " + content +" "+"has been denied access on:\n " + time.ctime()
-    #sender.sendmail(sendTo, emailSubject, emailContent)
-    print("Email Sent")
-    time.sleep(3)
-    display.lcd_clear()
 
