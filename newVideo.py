@@ -120,6 +120,7 @@ while(True):
                     time.sleep(3)
                     slotsAvailable()
                     print("PARKING FULL")
+                    break
                 #When all fail    
                 else:
                     display.lcd_display_string("Issue Found..", 1)
