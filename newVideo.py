@@ -17,6 +17,7 @@ import RPi.GPIO as GPIO #Gpio library
 import time 
 
 #GPIO Setup
+GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD) #Using the GPIO.BOARD setmode
 servoPin = 11 #Servo Motor control pin(Yellow)
 IR1 = 31 #Parking Slot 1 Infrared Sensor 
@@ -50,18 +51,18 @@ while(True):
     if text != '': #If extracted text is not null
         print(text,end=" ") #print the license plate
         content = str(text) #convert text to string format
-	##########Email server configuration for email notifications##########
+    ##########Email server configuration for email notifications##########
         sendTo = 'gastonkitambala@yahoo.com' #Receiver of email notifications
-        emailSubject = "APPROACHING VEHICLE!" #Email subject
+        emailSubject = "VEHICLE AUTHORISED!" #Email subject
         emailContent = "The vehicle with license number: " + content +" "+"has been granted access on:\n " + time.ctime() #Email Content
         if len(content) >= 5: #if the length of number plate is greater than 5 letters 
             if check_if_string_in_file('./Database/Database.txt', text): #Check if the license plate is in the Database
                 print('Registered') 
-		#Printing on LCD
+        #Printing on LCD
                 display.lcd_display_string("WELCOME:", 1)
                 display.lcd_display_string(text, 2)
                 time.sleep(2)
-		#If both parking lots are free
+        #If both parking lots are free
                 if sensor1 == 1 and sensor2 == 1:
                     availableSlots = 2
                     print("The Available Slots are :", availableSlots)
@@ -71,7 +72,7 @@ while(True):
                     display.lcd_display_string("AVAILABLE LOTS: ", 1)
                     display.lcd_display_string("1:FREE - 2:FREE", 2)
                     servoOpenClose() #Open and Close the Gate(Servo Motor)
-		    #Send Email With vehicle Details
+            #Send Email With vehicle Details
                     sender.sendmail(sendTo, emailSubject, emailContent)
                     print("Email Sent")
                     time.sleep(3)
@@ -79,7 +80,7 @@ while(True):
                     break
                     #continue
         
-		#If PArking 1 occupied and paring 2 is free
+        #If PArking 1 occupied and paring 2 is free
                 elif sensor1 == 0 and sensor2 == 1:
                     availableSlots = 1
                     print("The Available Slots are :", availableSlots)
@@ -89,13 +90,13 @@ while(True):
                     display.lcd_display_string("AVAILABLE LOTS: ", 1)
                     display.lcd_display_string("1:USED - 2:FREE", 2)
                     servoOpenClose() #Open and Close Gate(Sevro Motor)
-		    #Sending Email with vehicle Details
+            #Sending Email with vehicle Details
                     sender.sendmail(sendTo, emailSubject, emailContent)
                     print("Email Sent")
                     time.sleep(3)
                     slotsAvailable()
                     break
-		#If Parking 1  is free and parking 2 is used
+        #If Parking 1  is free and parking 2 is used
                 elif sensor1 == 1 and sensor2 == 0:
                     availableSlots = 1
                     print("The Available Slots are :", availableSlots)
@@ -105,12 +106,12 @@ while(True):
                     display.lcd_display_string("AVAILABLE LOTS: ", 1)
                     display.lcd_display_string("1:OPEN - 2:USED", 2)
                     servoOpenClose() #Open and Close Gate(Servo Motor)
-		    #Sending Email with Vehicle Details
+            #Sending Email with Vehicle Details
                     sender.sendmail(sendTo, emailSubject, emailContent)
                     print("Email Sent")
                     time.sleep(3)
                     slotsAvailable()
-		#If all parking lots are used = Parking is Full
+        #If all parking lots are used = Parking is Full
                 elif sensor1 == 0 and sensor2 == 0:
                     availableSlots = 0
                     print("No Parking Slot available")
@@ -131,11 +132,12 @@ while(True):
                 time.sleep(1)
                 display.lcd_clear()
 
-	   #When the extracted Vehicle License Plate is not in the database
+       #When the extracted Vehicle License Plate is not in the database
             else:
                 print('Not Registered')
                 time.sleep(3)
-                print("The available slots are :",availableSlots)
+                print("ACCESS DENIED")
+                time.sleep(2)
                 display.lcd_display_string(text, 1)
                 display.lcd_display_string("NOT REGISTERED", 2)
                 time.sleep(3)
@@ -143,7 +145,7 @@ while(True):
                 time.sleep(4)
                 display.lcd_display_string("Call Admin      ", 2)
                 time.sleep(4)
-		#Send email with the vehicle that has been denied access
+        #Send email with the vehicle that has been denied access
                 sendTo = 'gastonkitambala@yahoo.com'
                 emailSubject = "ACCESS DENIED!"
                 emailContent = "The vehicle with license number: " + content +" "+"has been denied access on:\n " + time.ctime()
@@ -153,26 +155,27 @@ while(True):
                 display.lcd_clear()
                 break
 
-            #Exit  Section of the System(To be improved, currently not working)
-            if exitSensor == 0:
-                if sensor1 or sensor2 == 0:
-                    availableSlots = 1
-                    servoOpenClose()
-                    availableSlots -=1
-                    display.lcd_display_string("AVAILABLE LOTS: ", 1)
-                    display.lcd_display_string(availableSlots, 2)
-                if sensor1 ==1 and sensor2 ==1:
-                    availableSlots = 2
-                    continue
-                if sensor1 == 0 and sensor2 == 0:
-                    availableSlots = 0
-                    servoOpenClose()
-                    availableSlots -=1
-                    display.lcd_display_string("AVAILABLE LOTS: ", 1)
-                    display.lcd_display_string(availableSlots, 2)
-	   ###******** End of exit Section *****###
+            #####Exit  Section of the System(To be improved, currently not working)
+            #if exitSensor == 0:
+                #if sensor1 or sensor2 == 0:
+                    #availableSlots = 1
+                    #servoOpenClose()
+                    #availableSlots -=1
+                    #display.lcd_display_string("AVAILABLE LOTS: ", 1)
+                    #display.lcd_display_string(availableSlots, 2)
+                #if sensor1 ==1 and sensor2 ==1:
+                    #availableSlots = 2
+                    #continue
+                #if sensor1 == 0 and sensor2 == 0:
+                    #availableSlots = 0
+                    #servoOpenClose()
+                    #availableSlots -=1
+                    #display.lcd_display_string("AVAILABLE LOTS: ", 1)
+                    #display.lcd_display_string(availableSlots, 2)
+       ###******** End of exit Section *****###
 
-	#When the length of the extracted license Plate is less than 5, Keep retrying until better quality is gotten
+    #When the length of the extracted license Plate is less than 5, Keep retrying until better quality is gotten
+            
         else:
             print("Retrying.....")
         

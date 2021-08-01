@@ -9,6 +9,7 @@ server.login("gastonkitambala@gmail.com", "kitambalas1998")
 ####  LCD Drivers
 import drivers
 display = drivers.Lcd()
+GPIO.setwarnings(False)
 
 #GPIO Setup
 servoPin = 11 #Pin 11 for Servo Motor
