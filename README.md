@@ -47,4 +47,6 @@ pip install matplotlib
 pip install pytesseract
 ```
 </ul>
+## <a href="https://www.youtube.com/watch?v=MX92imRYH08">Project prototype demo</a>
+
 #FYP-ANPR
