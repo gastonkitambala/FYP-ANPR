@@ -21,69 +21,75 @@ GPIO.setup(servoPin,GPIO.OUT)
 #pwm = GPIO.PWM(servoPin, 50)
 
 def servoOpenClose():
-    pwm.start(2)
+    # Initialize PWM on servoPin with 50Hz frequency
+    pwm = GPIO.PWM(servoPin, 50)
+    pwm.start(2)  # Start position (0 degrees)
     time.sleep(.5)
-    pwm.ChangeDutyCycle(7)
+    pwm.ChangeDutyCycle(7)  # Move to 90 degrees
     time.sleep(10)
-    pwm.ChangeDutyCycle(2)
+    pwm.ChangeDutyCycle(2)  # Return to 0 degrees
     time.sleep(10)
     pwm.stop()
 
 def slotsAvailable():
-    if sensor1 or sensor2 == 0:
-         availableSlots =1
-    if sensor1 ==1 and sensor2 ==1:
-        availableSlots = 2
+    # Get current sensor states
+    sensor1 = GPIO.input(IR1)
+    sensor2 = GPIO.input(IR2)
+    
+    # Calculate available slots
     if sensor1 == 0 and sensor2 == 0:
-        availableSlots = 0
-               
+        return 0
+    elif sensor1 == 1 and sensor2 == 1:
+        return 2
+    else:
+        return 1
 
 def checkEmptySlot():
+    # Read sensor states
     sensor1 = GPIO.input(IR1)
     sensor2 = GPIO.input(IR2)
     exitSensor = GPIO.input(exitIR)
     
+    # Display appropriate message based on sensor states
     if sensor1 == 1 and sensor2 == 1:
         display.lcd_display_string("L1:OPEN-L2:OPEN", 2)
-        #print("GO to 1 or 2 ")
     elif sensor1 == 0 and sensor2 == 1:
         display.lcd_display_string("Slot2: OPEN", 2)
-        #print("GO to 2")
     elif sensor1 == 1 and sensor2 == 0:
         display.lcd_display_string("Slot1: OPEN", 2)
-        #print("GO to 1")
     elif sensor1 == 0 and sensor2 == 0:
         display.lcd_display_string("PARKING FULL", 2)
-        #print("PARKING FULL")
     else:
         print("Unavailable")
-        
+
 def sendEmail(text):
     #currentTime = time.ctime()
     emailContent = ("Vehicle: " + text + "Has been granted access at: " )#+ currentTime)
     server.sendmail("gastonkitambala@gmail.com","gastonkitambala@yahoo.com",emailContent)
 
-def allowCar() :
+def allowCar(text, content):  # Added missing parameters
     print('Registered')
     display.lcd_display_string("WELCOME:", 1)
     display.lcd_display_string(text, 2)
     time.sleep(2)
-    #IR(Empty Slot)
+    
+    # Check and display available parking slots
     checkEmptySlot()
     time.sleep(1)
-    #ServoMotor
+    
+    # Open and close barrier
     servoOpenClose()
-    #send email
-    sendTo = 'gastonkitambala@yahoo.com'
-    emailSubject = "APPROACHING VEHICLE!"
-    emailContent = "The vehicle with license number: " + content +" "+"has been granted access on:\n " + time.ctime()
-    #sender.sendmail(sendTo, emailSubject, emailContent)
+    
+    # Send notification email
+    emailContent = f"The vehicle with license number: {content} has been granted access on:\n {time.ctime()}"
+    server.sendmail("gastonkitambala@gmail.com", "gastonkitambala@yahoo.com", emailContent)
     print("Email Sent")
+    
+    # Cleanup and clear display
     time.sleep(1)
     GPIO.cleanup()
     time.sleep(1)
     display.lcd_clear()
-
 
 def unauthorised(text, content) :
     print('Not Registered')
